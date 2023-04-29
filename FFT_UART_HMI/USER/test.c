@@ -27,7 +27,8 @@ int main(void)
 	DMA1_CH1_Start(NPT);
 	DMA1_CH5_Start(UART1_RX_BUFF_SIZE);
 	
-	TIM3_TRGO_Init(71, 49);	// 定时器更新频率=72MHz/((71+1)*(49+1))=20kHz
+	TIM3_TRGO_Init();				// 定时器初始化
+	TIM3_TRGO_Freq(20000);	// 定时器更新频率20kHz
 	
   while(1)
 	{
