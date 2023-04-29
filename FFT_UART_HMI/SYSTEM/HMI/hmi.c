@@ -22,7 +22,7 @@ static uint8_t send_data[256];
 static float sampling_freq = 20000;	// 采样频率，单位Hz
 static int16_t npt_pos = 0;					// FFT坐标点位置
 static float npt_freq = 0;					// FFT坐标点对应频率
-static uint16_t npt_power = 0;			// FFT坐标点对应幅值
+static float npt_power = 0;					// FFT坐标点对应幅值
 
 // HMI系统状态机
 void HMI_StateMachine(void)
@@ -51,6 +51,18 @@ void HMI_StateMachine(void)
 				sub_spectrum.exit_signal = 0;
 				sub_spectrum.cursor_update = 0;
 				npt_pos = 0;
+				sprintf(hmi_cmd, "t10.txt=\"%.2f\"\xFF\xFF\xFF", sampling_freq/2000/256*40);
+				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+				sprintf(hmi_cmd, "t11.txt=\"%.2f\"\xFF\xFF\xFF", sampling_freq/2000/256*40*2);
+				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+				sprintf(hmi_cmd, "t12.txt=\"%.2f\"\xFF\xFF\xFF", sampling_freq/2000/256*40*3);
+				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+				sprintf(hmi_cmd, "t13.txt=\"%.2f\"\xFF\xFF\xFF", sampling_freq/2000/256*40*4);
+				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+				sprintf(hmi_cmd, "t14.txt=\"%.2f\"\xFF\xFF\xFF", sampling_freq/2000/256*40*5);
+				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+				sprintf(hmi_cmd, "t15.txt=\"%.2f\"\xFF\xFF\xFF", sampling_freq/2000/256*40*6);
+				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
 			}
 			else if (KEY_Action_Down == KEY_Get_Flag(&KEY3_Obj))	// 按键3按下动作
 			{
@@ -86,7 +98,7 @@ void HMI_StateMachine(void)
 			}
 			else if (KEY_Action_Down == KEY_Get_Flag(&KEY2_Obj))	// 按键2按下动作
 			{
-				if (sampling_freq < 39999.9)	// 采样频率上限40kHz
+				if (sampling_freq < 79999.9)	// 采样频率上限80kHz
 				{
 					sampling_freq += 1000;			// 采样频率加1kHz
 				}
@@ -152,9 +164,9 @@ void SUB_StateMachine(SUB_Object_T* sub)	// 子系统状态机
 						for(i=0; i<NPT/4; i++)
 						{
 							send_data[4*i] = 0;
-							send_data[4*i+1] = (uint8_t)(lBufMagArray[i]/6);
+							send_data[4*i+1] = (uint8_t)(lBufMagArray[i]/31);
 							send_data[4*i+2] = 0;
-							send_data[4*i+3] = (uint8_t)(lBufMagArray[i]/6);
+							send_data[4*i+3] = send_data[4*i+1];
 						}
 					}
 					UART1_TX_Bytes(send_data, NPT);
@@ -223,12 +235,12 @@ void SUB_StateMachine(SUB_Object_T* sub)	// 子系统状态机
 				}
 				else
 				{
-					npt_freq = sampling_freq / NPT * npt_pos * 2;	// FFT坐标点对应频率
-					npt_power = lBufMagArray[npt_pos];						// FFT坐标点对应幅值
+					npt_freq = sampling_freq / NPT * npt_pos * 2;				// FFT坐标点对应频率
+					npt_power = (float)lBufMagArray[npt_pos]/4095*3.3;	// FFT坐标点对应幅值
 					
 					sprintf(hmi_cmd, "t2.txt=\"%.2f\"\xFF\xFF\xFF", npt_freq/1000);
 					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
-					sprintf(hmi_cmd, "t4.txt=\"%d\"\xFF\xFF\xFF", npt_power);
+					sprintf(hmi_cmd, "t4.txt=\"%.2f\"\xFF\xFF\xFF", npt_power);
 					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
 				}
 			}
