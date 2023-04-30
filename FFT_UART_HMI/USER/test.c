@@ -13,7 +13,7 @@
 /////////////////////////UCOSII任务设置///////////////////////////////////
 //START 任务
 //设置任务优先级
-#define START_TASK_PRIO		8		//开始任务的优先级设置为最低
+#define START_TASK_PRIO		4		//开始任务的优先级设置为最低
 //设置任务堆栈大小
 #define START_STK_SIZE		36
 //任务堆栈	
@@ -50,8 +50,9 @@ OS_EVENT * msg_key2;			// 按键2邮箱事件块指针
 OS_EVENT * msg_key3;			// 按键3邮箱事件块指针
 OS_EVENT * msg_key_enc;		// 编码器按键邮箱事件块指针
 OS_EVENT * msg_enc_delta;		// 编码器位置邮箱事件块指针
+OS_EVENT * msg_cpuload;			// CPU负载邮箱事件块指针
 
-char text_log[48];				// 测试日志
+char text_log[32];				// 测试日志
 
 // 主函数
 int main(void)
@@ -88,11 +89,12 @@ void start_task(void *pdata)
 {
 	OS_CPU_SR cpu_sr=0;
 	
-	msg_key1 = OSMboxCreate((void*)0);		// 创建消息邮箱
-	msg_key2 = OSMboxCreate((void*)0);		// 创建消息邮箱
-	msg_key3 = OSMboxCreate((void*)0);		// 创建消息邮箱
-	msg_key_enc = OSMboxCreate((void*)0);	// 创建消息邮箱
+	msg_key1 = OSMboxCreate((void*)0);			// 创建消息邮箱
+	msg_key2 = OSMboxCreate((void*)0);			// 创建消息邮箱
+	msg_key3 = OSMboxCreate((void*)0);			// 创建消息邮箱
+	msg_key_enc = OSMboxCreate((void*)0);		// 创建消息邮箱
 	msg_enc_delta = OSMboxCreate((void*)0);	// 创建消息邮箱
+	msg_cpuload = OSMboxCreate((void*)0);		// 创建消息邮箱
 	
 	OSStatInit();							// 初始化统计任务.这里会延时1秒钟左右	
  	OS_ENTER_CRITICAL();			// 进入临界区(无法被中断打断)
@@ -122,27 +124,27 @@ void start_task(void *pdata)
 										OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR
 									);
 										
-//	OSTaskCreateExt(	led_task,	
-//										(void *)0,
-//										(OS_STK *)&LED_TASK_STK[LED_STK_SIZE-1], 
-//										LED_TASK_PRIO,
-//										2,
-//										(OS_STK *)&LED_TASK_STK[0], 
-//										LED_STK_SIZE,
-//										(void *)0,
-//										OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR
-//									);
+	OSTaskCreateExt(	led_task,	
+										(void *)0,
+										(OS_STK *)&LED_TASK_STK[LED_STK_SIZE-1], 
+										LED_TASK_PRIO,
+										2,
+										(OS_STK *)&LED_TASK_STK[0], 
+										LED_STK_SIZE,
+										(void *)0,
+										OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR
+									);
 										
-//	OSTaskCreateExt(	test_task,
-//										(void *)0,
-//										(OS_STK *)&TEST_TASK_STK[TEST_STK_SIZE-1], 
-//										TEST_TASK_PRIO,
-//										3,
-//										(OS_STK *)&TEST_TASK_STK[0], 
-//										TEST_STK_SIZE,
-//										(void *)0,
-//										OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR
-//									);
+	OSTaskCreateExt(	test_task,
+										(void *)0,
+										(OS_STK *)&TEST_TASK_STK[TEST_STK_SIZE-1], 
+										TEST_TASK_PRIO,
+										3,
+										(OS_STK *)&TEST_TASK_STK[0], 
+										TEST_STK_SIZE,
+										(void *)0,
+										OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR
+									);
 	
  	OSTaskSuspend(START_TASK_PRIO);	//挂起起始任务.
 	OS_EXIT_CRITICAL();				//退出临界区(可以被中断打断)
@@ -183,52 +185,37 @@ void user_input_task(void *pdata)
 // LED任务
 void led_task(void *pdata)
 {
-	uint8_t err;
-	
 	while(1)
 	{
-//		if (KEY_Action_Down == (uint32_t)OSMboxPend(msg_key1, 10, &err))
-//		{
-//			LED = 0;
-//		}
-//		if (KEY_Action_Down == (uint32_t)OSMboxPend(msg_key2, 10, &err))
-//		{
-//			LED = 1;
-//		}
-		(uint32_t)OSMboxPend(msg_enc_delta, 0, &err);
 		LED = ~LED;
+		delay_ms(100);
 	}
 }
 
 // 测试任务，获取CPU负载率，以及各任务栈空间使用情况
 void test_task(void *pdata)
 {
-	OS_STK_DATA StackData;
+//	OS_STK_DATA StackData;	
 	
 	while(1)
 	{
-		sprintf(text_log, "CPU Usage:%d%%\r\n", OSCPUUsage);
-		UART1_TX_Bytes((uint8_t*)text_log, strlen(text_log));
+		OSMboxPost(msg_cpuload, (void*)OSCPUUsage);	//发送CPU负载消息
+		delay_ms(500);
 		
-		OSTaskStkChk(MAIN_TASK_PRIO, &StackData);
-		sprintf(text_log, "MAIN Stack:%d %d\r\n", StackData.OSUsed, StackData.OSFree);
-		UART1_TX_Bytes((uint8_t*)text_log, strlen(text_log));
-		
-		OSTaskStkChk(USER_INPUT_TASK_PRIO, &StackData);
-		sprintf(text_log, "USER_INPUT Stack:%d %d\r\n", StackData.OSUsed, StackData.OSFree);
-		UART1_TX_Bytes((uint8_t*)text_log, strlen(text_log));
-		
-		OSTaskStkChk(LED_TASK_PRIO, &StackData);
-		sprintf(text_log, "LED Stack:%d %d\r\n", StackData.OSUsed, StackData.OSFree);
-		UART1_TX_Bytes((uint8_t*)text_log, strlen(text_log));
-		
-		OSTaskStkChk(TEST_TASK_PRIO, &StackData);
-		sprintf(text_log, "TEST Stack:%d %d\r\n", StackData.OSUsed, StackData.OSFree);
-		UART1_TX_Bytes((uint8_t*)text_log, strlen(text_log));
-		
-//		sprintf(text_log, "Encoder:%u\r\n", GetEncVal());
+//		OSTaskStkChk(MAIN_TASK_PRIO, &StackData);
+//		sprintf(text_log, "MAIN Stack:%d %d\r\n", StackData.OSUsed, StackData.OSFree);
 //		UART1_TX_Bytes((uint8_t*)text_log, strlen(text_log));
-		
-		delay_ms(1000);
+//		
+//		OSTaskStkChk(USER_INPUT_TASK_PRIO, &StackData);
+//		sprintf(text_log, "USER_INPUT Stack:%d %d\r\n", StackData.OSUsed, StackData.OSFree);
+//		UART1_TX_Bytes((uint8_t*)text_log, strlen(text_log));
+//		
+//		OSTaskStkChk(LED_TASK_PRIO, &StackData);
+//		sprintf(text_log, "LED Stack:%d %d\r\n", StackData.OSUsed, StackData.OSFree);
+//		UART1_TX_Bytes((uint8_t*)text_log, strlen(text_log));
+//		
+//		OSTaskStkChk(TEST_TASK_PRIO, &StackData);
+//		sprintf(text_log, "TEST Stack:%d %d\r\n", StackData.OSUsed, StackData.OSFree);
+//		UART1_TX_Bytes((uint8_t*)text_log, strlen(text_log));
 	}
 }

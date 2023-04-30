@@ -15,14 +15,17 @@ extern OS_EVENT * msg_key1;				// 按键1邮箱事件块指针
 extern OS_EVENT * msg_key2;				// 按键2邮箱事件块指针
 extern OS_EVENT * msg_key3;				// 按键3邮箱事件块指针
 extern OS_EVENT * msg_key_enc;		// 编码器按键邮箱事件块指针
-extern OS_EVENT * msg_enc_delta;		// 编码器位置邮箱事件块指针
+extern OS_EVENT * msg_enc_delta;	// 编码器位置邮箱事件块指针
+extern OS_EVENT * msg_cpuload;		// CPU负载邮箱事件块指针
 
 uint32_t lBufInArray[NPT];			/* FFT 运算的输入数组 */
 uint32_t lBufOutArray[NPT/2];		/* FFT 运算的输出数组 */
 uint32_t lBufMagArray[NPT/2];		/* 各谐波分量的幅值 */
 
 HMI_STATE_E hmi_state = HMI_Default;
-SUB_Object_T sub_spectrum;			// 频谱仪子系统对象
+FFT_SUB_Object_T sub_fft;		// 频谱仪子系统对象
+Menu_SUB_Object_T sub_menu;	// 菜单子系统对象
+
 static char hmi_cmd[32];
 static uint8_t send_data[256];
 static float sampling_freq = 20000;	// 采样频率，单位Hz
@@ -32,6 +35,8 @@ static float npt_power = 0;					// FFT坐标点对应幅值
 
 static uint8_t err;
 static int16_t enc_dalta = 0;
+//static uint8_t x_zoom = 1;			// x轴缩放
+static uint8_t y_zoom = 1;			// y轴缩放
 
 // HMI系统状态机
 void HMI_StateMachine(void)
@@ -41,71 +46,92 @@ void HMI_StateMachine(void)
 	switch(hmi_state)
 	{
 		case HMI_Start: {		// 开始界面
-			if (1000 == cnt)	// 延时1000ms
+			if (500 == cnt)	// 延时500ms
 			{
 				hmi_state = HMI_Menu;	// 切换到菜单界面
+				sub_menu.state = Menu_SUB_Default;
 				sprintf(hmi_cmd, "page 1\xFF\xFF\xFF");
+				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+			}
+			if (0 != (uint32_t)OSMboxPend(msg_cpuload, 1, &err))
+			{
+				sprintf(hmi_cmd, "cpu.txt=\"CPU:%u%%\"\xFF\xFF\xFF", OSCPUUsage);
 				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
 			}
 			cnt++;
 		} break;
 		
-		case HMI_Menu: {	// 菜单界面
-			if (KEY_Action_Down == (uint32_t)OSMboxPend(msg_key1, 1, &err))	// 按键1按下动作
+		case HMI_Menu: {		// 菜单界面
+			if (KEY_Action_Down == (uint32_t)OSMboxPend(msg_key_enc, 1, &err))	// 编码器按键按下动作
 			{
-				hmi_state = HMI_Spectrum;	// 切换到频谱仪界面
-				sprintf(hmi_cmd, "page 2\xFF\xFF\xFF");
-				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
-				sub_spectrum.state = SUB_Default;
-				sub_spectrum.exit_signal = 0;
-				sub_spectrum.cursor_update = 0;
-				npt_pos = 0;
-				sprintf(hmi_cmd, "t10.txt=\"%.2f\"\xFF\xFF\xFF", sampling_freq/2000/256*40);
-				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
-				sprintf(hmi_cmd, "t11.txt=\"%.2f\"\xFF\xFF\xFF", sampling_freq/2000/256*40*2);
-				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
-				sprintf(hmi_cmd, "t12.txt=\"%.2f\"\xFF\xFF\xFF", sampling_freq/2000/256*40*3);
-				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
-				sprintf(hmi_cmd, "t13.txt=\"%.2f\"\xFF\xFF\xFF", sampling_freq/2000/256*40*4);
-				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
-				sprintf(hmi_cmd, "t14.txt=\"%.2f\"\xFF\xFF\xFF", sampling_freq/2000/256*40*5);
-				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
-				sprintf(hmi_cmd, "t15.txt=\"%.2f\"\xFF\xFF\xFF", sampling_freq/2000/256*40*6);
-				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+				if (Menu_SUB_FFT == sub_menu.state)
+				{
+					hmi_state = HMI_Spectrum;	// 切换到频谱仪界面
+					sprintf(hmi_cmd, "page 2\xFF\xFF\xFF");
+					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+					sub_fft.state = FFT_SUB_Default;
+					sub_fft.exit_signal = 0;
+					sub_fft.cursor_update = 0;
+					npt_pos = 0;
+					sprintf(hmi_cmd, "f1.txt=\"%.2f\"\xFF\xFF\xFF", sampling_freq/2000/256*40);
+					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+					sprintf(hmi_cmd, "f2.txt=\"%.2f\"\xFF\xFF\xFF", sampling_freq/2000/256*40*2);
+					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+					sprintf(hmi_cmd, "f3.txt=\"%.2f\"\xFF\xFF\xFF", sampling_freq/2000/256*40*3);
+					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+					sprintf(hmi_cmd, "f4.txt=\"%.2f\"\xFF\xFF\xFF", sampling_freq/2000/256*40*4);
+					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+					sprintf(hmi_cmd, "f5.txt=\"%.2f\"\xFF\xFF\xFF", sampling_freq/2000/256*40*5);
+					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+					sprintf(hmi_cmd, "f6.txt=\"%.2f\"\xFF\xFF\xFF", sampling_freq/2000/256*40*6);
+					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+				}
+				else if (Menu_SUB_Setting == sub_menu.state)
+				{
+					hmi_state = HMI_Setting;	// 切换到设置界面
+					sprintf(hmi_cmd, "page 3\xFF\xFF\xFF");
+					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+				}
 			}
-			else if (KEY_Action_Down == (uint32_t)OSMboxPend(msg_key3, 1, &err))	// 按键3按下动作
+			else
 			{
-				hmi_state = HMI_Setting;	// 切换到设置界面
-				sprintf(hmi_cmd, "page 3\xFF\xFF\xFF");
+				Menu_SUB_StateMachine(&sub_menu);	// 菜单子系统状态机
+			}
+			
+			if (0 != (uint32_t)OSMboxPend(msg_cpuload, 1, &err))
+			{
+				sprintf(hmi_cmd, "cpu.txt=\"CPU:%u%%\"\xFF\xFF\xFF", OSCPUUsage);
 				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
 			}
 		} break;
 		
 		case HMI_Spectrum: {	// 频谱仪界面
-			if (KEY_Action_Down == (uint32_t)OSMboxPend(msg_key3, 1, &err))	// 按键3按下动作
+			if (KEY_Action_Down == (uint32_t)OSMboxPend(msg_key_enc, 1, &err))	// 编码器按键按下动作
 			{
-				sub_spectrum.exit_signal = 1;		// 发送频谱仪子系统中止信号
+				sub_fft.exit_signal = 1;		// 发送频谱仪子系统中止信号
 			}
-			else if (SUB_Exit == sub_spectrum.state)	// 子系统退出
+			else if (FFT_SUB_Exit == sub_fft.state)	// 子系统退出
 			{
 				hmi_state = HMI_Menu;	// 切换到菜单界面
+				sub_menu.state = Menu_SUB_Default;
 				sprintf(hmi_cmd, "page 1\xFF\xFF\xFF");
 				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
 			}
 			else
 			{
-				SUB_StateMachine(&sub_spectrum);	// 频谱仪子系统状态机
+				FFT_SUB_StateMachine(&sub_fft);	// 频谱仪子系统状态机
 			}
 		} break;
 		
 		case HMI_Setting: {	// 设置界面
 			enc_dalta = (int32_t)OSMboxPend(msg_enc_delta, 1, &err);
 			
-			if (KEY_Action_Down == (uint32_t)OSMboxPend(msg_key3, 1, &err))	// 按键3按下动作
+			if (KEY_Action_Down == (uint32_t)OSMboxPend(msg_key_enc, 1, &err))	// 编码器按键按下动作
 			{
 				TIM3_TRGO_Freq(sampling_freq);		// 设置TIM3触发频率
 				
 				hmi_state = HMI_Menu;	// 切换到菜单界面
+				sub_menu.state = Menu_SUB_Default;
 				sprintf(hmi_cmd, "page 1\xFF\xFF\xFF");
 				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
 			}
@@ -114,17 +140,23 @@ void HMI_StateMachine(void)
 				sampling_freq += (float)enc_dalta * 1000;
 				
 				// 采样频率限幅
-				if (sampling_freq > 80000.0)			// 采样频率上限80kHz
+				if (sampling_freq > MAX_SAM_FREQ)				// 采样频率上限
 				{
-					sampling_freq = 80000.0;			
+					sampling_freq = MAX_SAM_FREQ;			
 				}
-				else if (sampling_freq < 10000.0)	// 采样频率下限10kHz
+				else if (sampling_freq < MIN_SAM_FREQ)	// 采样频率下限
 				{
-					sampling_freq = 10000.0;
+					sampling_freq = MIN_SAM_FREQ;
 				}
 				
 				sprintf(hmi_cmd, "n0.val=%d\xFF\xFF\xFF", (int32_t)(sampling_freq/1000));
 				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+				
+				if (0 != (uint32_t)OSMboxPend(msg_cpuload, 1, &err))
+				{
+					sprintf(hmi_cmd, "cpu.txt=\"CPU:%u%%\"\xFF\xFF\xFF", OSCPUUsage);
+					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+				}
 			}
 		} break;
 		
@@ -137,25 +169,27 @@ void HMI_StateMachine(void)
 }
 
 
-void SUB_StateMachine(SUB_Object_T* sub)	// 子系统状态机
+// 频谱仪子系统状态机
+void FFT_SUB_StateMachine(FFT_SUB_Object_T* sub)
 {
 	uint8_t rx_data[32];
+	uint32_t temp = 0;
 	uint16_t i;
 	
 	switch(sub->state)
 	{
-		case SUB_SendCMD: {		// 透传命令发送状态
+		case FFT_SUB_SendCMD: {		// 透传命令发送状态
 			if (UART1_RX_Bytes(rx_data, uart_rx_len))	// 接收到显示屏的应答
 			{
 				if (0 == memcmp(rx_data, "\xFE\xFF\xFF\xFF", 4))	// 是否为透传就绪
 				{
-					sub->state = SUB_SendData;	// 切换到发送数据状态
+					sub->state = FFT_SUB_SendData;	// 切换到发送数据状态
 					if (0 != sub->cursor_update)	//填充游标数组
 					{
 						sub->cursor_update = 0;
 						
 						memset(send_data, 0x00, sizeof(send_data));
-						send_data[2*npt_pos] = 150;
+						send_data[2*npt_pos] = SCOPE_HIGH;
 					}
 					else	//填充频谱数组
 					{
@@ -173,7 +207,15 @@ void SUB_StateMachine(SUB_Object_T* sub)	// 子系统状态机
 						GetPowerMag();																					//取直流分量对应的AD值
 						for(i=0; i<NPT/2; i++)
 						{
-							send_data[2*i] = (uint8_t)(lBufMagArray[i]/31);
+							temp = lBufMagArray[i]/25 * y_zoom;
+							if (temp < 256)
+							{
+								send_data[2*i] = (uint8_t)temp;
+							}
+							else
+							{
+								send_data[2*i] = 255;
+							}
 							send_data[2*i+1] = 0;
 						}
 					}
@@ -182,26 +224,26 @@ void SUB_StateMachine(SUB_Object_T* sub)	// 子系统状态机
 			}
 		} break;
 		
-		case SUB_SendData: {	// 透传数据发送状态
+		case FFT_SUB_SendData: {	// 透传数据发送状态
 			if (UART1_RX_Bytes(rx_data, uart_rx_len))	// 接收到显示屏的应答
 			{
 				if (0 == memcmp(rx_data, "\xFD\xFF\xFF\xFF", 4))	// 是否为透传完成
 				{
-					sub->state = SUB_Default;	// 切换到初始状态
+					sub->state = FFT_SUB_Default;	// 切换到初始状态
 					DMA1_CH1_Start(NPT);	// 启动DMA1 CH1
 				}
 			}
 		} break;
 		
-		case SUB_Default: {		// 初始状态
+		case FFT_SUB_Default: {		// 初始状态
 			if (0 != sub->exit_signal)		// 接收到中止信号
 			{
-				sub->state = SUB_Exit;			// 子系统退出
+				sub->state = FFT_SUB_Exit;			// 子系统退出
 				sub->exit_signal = 0;				// 退出完成，中止信号置0
 			}
 			else if (0 != adc_dma_flag)
 			{
-				sub->state = SUB_SendCMD;		// 切换到发送命令状态
+				sub->state = FFT_SUB_SendCMD;		// 切换到发送命令状态
 				adc_dma_flag = 0;						// 传输完成标志置0
 				DMA1_CH1_Stop();						// DMA1通道1停止
 				// 发送数据透传命令
@@ -213,7 +255,7 @@ void SUB_StateMachine(SUB_Object_T* sub)	// 子系统状态机
 				enc_dalta = (int32_t)OSMboxPend(msg_enc_delta, 1, &err);
 				if (0 != enc_dalta)	// 编码器增量不为0
 				{
-					sub->state = SUB_SendCMD;		// 切换到发送命令状态
+					sub->state = FFT_SUB_SendCMD;		// 切换到发送命令状态
 					sub->cursor_update = 1;			// 游标更新
 					
 					npt_pos += enc_dalta;				// npt坐标点加编码器增量
@@ -230,6 +272,35 @@ void SUB_StateMachine(SUB_Object_T* sub)	// 子系统状态机
 					sprintf(hmi_cmd, "addt s0.id,1,%d\xFF\xFF\xFF", NPT);
 					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
 				}
+				else if (KEY_Action_Down == (uint32_t)OSMboxPend(msg_key3, 1, &err))	// 按键3按下动作
+				{
+					sub->state = FFT_SUB_SendCMD;		// 切换到发送命令状态
+					sub->cursor_update = 1;			// 游标更新
+					
+					npt_pos = GetMaxIndex();		// 获取最大幅度对应频率
+					// 发送数据透传命令
+					sprintf(hmi_cmd, "addt s0.id,1,%d\xFF\xFF\xFF", NPT);
+					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+				}
+				else if (KEY_Action_Down == (uint32_t)OSMboxPend(msg_key2, 1, &err))	// 按键2按下动作
+				{
+					y_zoom ++;	// 改变Y轴缩放
+					if (y_zoom > 3)
+					{
+						y_zoom = 1;
+					}
+					sprintf(hmi_cmd, "t6.txt=\"Y Zoom:%u.0\"\xFF\xFF\xFF", y_zoom);
+					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+					
+					sprintf(hmi_cmd, "v1.txt=\"%.2f\"\xFF\xFF\xFF", 3.3/y_zoom/4);
+					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+					sprintf(hmi_cmd, "v2.txt=\"%.2f\"\xFF\xFF\xFF", 3.3/y_zoom/4*2);
+					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+					sprintf(hmi_cmd, "v3.txt=\"%.2f\"\xFF\xFF\xFF", 3.3/y_zoom/4*3);
+					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+					sprintf(hmi_cmd, "v4.txt=\"%.2f\"\xFF\xFF\xFF", 3.3/y_zoom/4*4);
+					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+				}
 				else
 				{
 					npt_freq = sampling_freq / NPT * npt_pos;						// FFT坐标点对应频率
@@ -239,11 +310,90 @@ void SUB_StateMachine(SUB_Object_T* sub)	// 子系统状态机
 					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
 					sprintf(hmi_cmd, "t4.txt=\"%.2f\"\xFF\xFF\xFF", npt_power);
 					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+					
+					if (0 != (uint32_t)OSMboxPend(msg_cpuload, 1, &err))
+					{
+						sprintf(hmi_cmd, "cpu.txt=\"CPU:%u%%\"\xFF\xFF\xFF", OSCPUUsage);
+						UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+					}
 				}
 			}
 		} break;
 		
-		case SUB_Exit: {		// 退出状态
+		case FFT_SUB_Exit: {		// 退出状态
+		} break;
+	}
+}
+
+// 菜单子系统状态机
+void Menu_SUB_StateMachine(Menu_SUB_Object_T* sub)
+{
+	switch(sub->state)
+	{
+		case Menu_SUB_FFT: {			// 频谱仪选择状态
+			enc_dalta = (int32_t)OSMboxPend(msg_enc_delta, 1, &err);
+			if (0 < enc_dalta) // 正转
+			{
+				sub->state = Menu_SUB_Setting;
+				sprintf(hmi_cmd, "p0.pic=1\xFF\xFF\xFF");
+				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+				sprintf(hmi_cmd, "p1.pic=4\xFF\xFF\xFF");
+				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+			}
+			else if (0 > enc_dalta) // 反转
+			{
+				sub->state = Menu_SUB_Default;
+				sprintf(hmi_cmd, "p0.pic=1\xFF\xFF\xFF");
+				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+				sprintf(hmi_cmd, "p1.pic=3\xFF\xFF\xFF");
+				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+			}
+		} break;
+		
+		case Menu_SUB_Setting: {	// 设置选择状态
+			enc_dalta = (int32_t)OSMboxPend(msg_enc_delta, 1, &err);
+			if (0 < enc_dalta) // 正转
+			{
+				sub->state = Menu_SUB_Default;
+				sprintf(hmi_cmd, "p0.pic=1\xFF\xFF\xFF");
+				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+				sprintf(hmi_cmd, "p1.pic=3\xFF\xFF\xFF");
+				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+			}
+			else if (0 > enc_dalta) // 反转
+			{
+				sub->state = Menu_SUB_FFT;
+				sprintf(hmi_cmd, "p0.pic=2\xFF\xFF\xFF");
+				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+				sprintf(hmi_cmd, "p1.pic=3\xFF\xFF\xFF");
+				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+			}
+		} break;
+		
+		case Menu_SUB_Default: {	// 初始状态
+			enc_dalta = (int32_t)OSMboxPend(msg_enc_delta, 1, &err);
+			if (0 != enc_dalta)	// 编码器增量不为0
+			{
+				if (0 < enc_dalta) // 正转
+				{
+					sub->state = Menu_SUB_FFT;
+					sprintf(hmi_cmd, "p0.pic=2\xFF\xFF\xFF");
+					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+					sprintf(hmi_cmd, "p1.pic=3\xFF\xFF\xFF");
+					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+				}
+				else if (0 > enc_dalta) // 反转
+				{
+					sub->state = Menu_SUB_Setting;
+					sprintf(hmi_cmd, "p0.pic=1\xFF\xFF\xFF");
+					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+					sprintf(hmi_cmd, "p1.pic=4\xFF\xFF\xFF");
+					UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+				}
+			}
+		} break;
+		
+		case Menu_SUB_Exit: {			// 退出状态
 		} break;
 	}
 }
@@ -290,3 +440,19 @@ void Creat_Single(void)
 	}
 }
 
+// 获取最大幅度对应频率
+uint16_t GetMaxIndex(void)
+{
+	uint16_t i, max_index = 0;
+	uint32_t max_val = 0;
+	
+	for (i = 0; i < NPT/2; i++)
+	{
+		if (lBufMagArray[i] > max_val)
+		{
+			max_val = lBufMagArray[i];
+			max_index = i;
+		}
+	}
+	return max_index;
+}
