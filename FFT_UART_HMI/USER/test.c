@@ -52,8 +52,6 @@ OS_EVENT * msg_key_enc;		// 编码器按键邮箱事件块指针
 OS_EVENT * msg_enc_delta;		// 编码器位置邮箱事件块指针
 OS_EVENT * msg_cpuload;			// CPU负载邮箱事件块指针
 
-char text_log[32];				// 测试日志
-
 // 主函数
 int main(void)
 {	
@@ -99,52 +97,10 @@ void start_task(void *pdata)
 	OSStatInit();							// 初始化统计任务.这里会延时1秒钟左右	
  	OS_ENTER_CRITICAL();			// 进入临界区(无法被中断打断)
 	
-// 	OSTaskCreate(led_task,(void *)0,(OS_STK *)&LED_TASK_STK[LED_STK_SIZE-1], LED_TASK_PRIO);
-//	OSTaskCreate(test_task,(void *)0,(OS_STK *)&TEST_TASK_STK[TEST_STK_SIZE-1], TEST_TASK_PRIO);
-	
-	OSTaskCreateExt(	main_task,
-										(void *)0,
-										(OS_STK *)&MAIN_TASK_STK[MAIN_STK_SIZE-1], 
-										MAIN_TASK_PRIO,
-										0,
-										(OS_STK *)&MAIN_TASK_STK[0], 
-										MAIN_STK_SIZE,
-										(void *)0,
-										OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR
-									);
-										
-	OSTaskCreateExt(	user_input_task,	
-										(void *)0,
-										(OS_STK *)&USER_INPUT_TASK_STK[USER_INPUT_STK_SIZE-1], 
-										USER_INPUT_TASK_PRIO,
-										1,
-										(OS_STK *)&USER_INPUT_TASK_STK[0], 
-										USER_INPUT_STK_SIZE,
-										(void *)0,
-										OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR
-									);
-										
-	OSTaskCreateExt(	led_task,	
-										(void *)0,
-										(OS_STK *)&LED_TASK_STK[LED_STK_SIZE-1], 
-										LED_TASK_PRIO,
-										2,
-										(OS_STK *)&LED_TASK_STK[0], 
-										LED_STK_SIZE,
-										(void *)0,
-										OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR
-									);
-										
-	OSTaskCreateExt(	test_task,
-										(void *)0,
-										(OS_STK *)&TEST_TASK_STK[TEST_STK_SIZE-1], 
-										TEST_TASK_PRIO,
-										3,
-										(OS_STK *)&TEST_TASK_STK[0], 
-										TEST_STK_SIZE,
-										(void *)0,
-										OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR
-									);
+	OSTaskCreate(main_task,(void *)0,(OS_STK *)&MAIN_TASK_STK[MAIN_STK_SIZE-1], MAIN_TASK_PRIO);
+	OSTaskCreate(user_input_task,(void *)0,(OS_STK *)&USER_INPUT_TASK_STK[USER_INPUT_STK_SIZE-1], USER_INPUT_TASK_PRIO);
+ 	OSTaskCreate(led_task,(void *)0,(OS_STK *)&LED_TASK_STK[LED_STK_SIZE-1], LED_TASK_PRIO);
+	OSTaskCreate(test_task,(void *)0,(OS_STK *)&TEST_TASK_STK[TEST_STK_SIZE-1], TEST_TASK_PRIO);
 	
  	OSTaskSuspend(START_TASK_PRIO);	//挂起起始任务.
 	OS_EXIT_CRITICAL();				//退出临界区(可以被中断打断)
@@ -181,7 +137,6 @@ void user_input_task(void *pdata)
 	}
 }
 
-
 // LED任务
 void led_task(void *pdata)
 {
@@ -192,30 +147,12 @@ void led_task(void *pdata)
 	}
 }
 
-// 测试任务，获取CPU负载率，以及各任务栈空间使用情况
+// 测试任务，每500ms发送CPU负载率消息
 void test_task(void *pdata)
 {
-//	OS_STK_DATA StackData;	
-	
 	while(1)
 	{
 		OSMboxPost(msg_cpuload, (void*)OSCPUUsage);	//发送CPU负载消息
 		delay_ms(500);
-		
-//		OSTaskStkChk(MAIN_TASK_PRIO, &StackData);
-//		sprintf(text_log, "MAIN Stack:%d %d\r\n", StackData.OSUsed, StackData.OSFree);
-//		UART1_TX_Bytes((uint8_t*)text_log, strlen(text_log));
-//		
-//		OSTaskStkChk(USER_INPUT_TASK_PRIO, &StackData);
-//		sprintf(text_log, "USER_INPUT Stack:%d %d\r\n", StackData.OSUsed, StackData.OSFree);
-//		UART1_TX_Bytes((uint8_t*)text_log, strlen(text_log));
-//		
-//		OSTaskStkChk(LED_TASK_PRIO, &StackData);
-//		sprintf(text_log, "LED Stack:%d %d\r\n", StackData.OSUsed, StackData.OSFree);
-//		UART1_TX_Bytes((uint8_t*)text_log, strlen(text_log));
-//		
-//		OSTaskStkChk(TEST_TASK_PRIO, &StackData);
-//		sprintf(text_log, "TEST Stack:%d %d\r\n", StackData.OSUsed, StackData.OSFree);
-//		UART1_TX_Bytes((uint8_t*)text_log, strlen(text_log));
 	}
 }

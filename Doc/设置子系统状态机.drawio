@@ -1,0 +1,156 @@
+<mxfile host="app.diagrams.net" modified="2023-05-01T03:58:07.342Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0" etag="0KlHa4TvqnTeP5v144N5" version="21.2.1" type="device">
+  <diagram name="第 1 页" id="EEHayBx_I6HFir8lFWiM">
+    <mxGraphModel dx="1290" dy="2220" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-30" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;labelBackgroundColor=none;strokeColor=#A8201A;fontColor=default;" edge="1" parent="1" source="A3RINRjMxJ3us1nBMxTI-7" target="A3RINRjMxJ3us1nBMxTI-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-53" value="【旋钮正转】" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#143642;rounded=1;" vertex="1" connectable="0" parent="A3RINRjMxJ3us1nBMxTI-30">
+          <mxGeometry x="-0.2667" y="1" relative="1" as="geometry">
+            <mxPoint x="6" y="-9" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-48" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=none;strokeColor=#A8201A;fontColor=default;" edge="1" parent="1" source="A3RINRjMxJ3us1nBMxTI-7" target="A3RINRjMxJ3us1nBMxTI-25">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="223" y="-1055" />
+              <mxPoint x="978" y="-1055" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-51" value="【旋钮反转】" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#143642;rounded=1;" vertex="1" connectable="0" parent="A3RINRjMxJ3us1nBMxTI-48">
+          <mxGeometry x="-0.0314" y="-2" relative="1" as="geometry">
+            <mxPoint y="-7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-49" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=none;strokeColor=#A8201A;fontColor=default;" edge="1" parent="1" source="A3RINRjMxJ3us1nBMxTI-7" target="A3RINRjMxJ3us1nBMxTI-20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-52" value="【旋钮按键按下】" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#143642;rounded=1;" vertex="1" connectable="0" parent="A3RINRjMxJ3us1nBMxTI-49">
+          <mxGeometry x="-0.16" y="1" relative="1" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-7" value="默认状态" style="swimlane;whiteSpace=wrap;html=1;labelBackgroundColor=none;rounded=1;fillColor=#FAE5C7;strokeColor=#0F8B8D;fontColor=#143642;" vertex="1" parent="1">
+          <mxGeometry x="170" y="-1255" width="210" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-8" value="&lt;div align=&quot;left&quot;&gt;Entry: &lt;br&gt;&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;Do:&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &lt;br&gt;&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;Exit:&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;labelBackgroundColor=none;rounded=1;fontColor=#143642;" vertex="1" parent="A3RINRjMxJ3us1nBMxTI-7">
+          <mxGeometry x="10" y="18" width="50" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-9" value="" style="ellipse;html=1;shape=startState;labelBackgroundColor=none;rounded=1;fillColor=#FAE5C7;strokeColor=#0F8B8D;fontColor=#143642;" vertex="1" parent="1">
+          <mxGeometry x="261" y="-1315" width="28" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-10" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;verticalAlign=bottom;endArrow=open;endSize=8;rounded=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=none;fontColor=default;strokeColor=#A8201A;" edge="1" parent="1" source="A3RINRjMxJ3us1nBMxTI-9" target="A3RINRjMxJ3us1nBMxTI-7">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260" y="-1315" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-28" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;labelBackgroundColor=none;strokeColor=#A8201A;fontColor=default;" edge="1" parent="1" source="A3RINRjMxJ3us1nBMxTI-17" target="A3RINRjMxJ3us1nBMxTI-25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-56" value="【旋钮正转】" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#143642;rounded=1;" vertex="1" connectable="0" parent="A3RINRjMxJ3us1nBMxTI-28">
+          <mxGeometry x="-0.3273" y="1" relative="1" as="geometry">
+            <mxPoint x="13" y="-9" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-31" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;labelBackgroundColor=none;strokeColor=#A8201A;fontColor=default;" edge="1" parent="1" source="A3RINRjMxJ3us1nBMxTI-17" target="A3RINRjMxJ3us1nBMxTI-7">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="370" y="-1180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-54" value="【旋钮反转】" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#143642;rounded=1;" vertex="1" connectable="0" parent="A3RINRjMxJ3us1nBMxTI-31">
+          <mxGeometry x="0.1667" y="-3" relative="1" as="geometry">
+            <mxPoint y="-7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-43" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=0;exitDx=0;exitDy=0;labelBackgroundColor=none;strokeColor=#A8201A;fontColor=default;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="A3RINRjMxJ3us1nBMxTI-17" target="A3RINRjMxJ3us1nBMxTI-33">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="550" y="-1300" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-57" value="【旋钮按键按下】" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#143642;rounded=1;" vertex="1" connectable="0" parent="A3RINRjMxJ3us1nBMxTI-43">
+          <mxGeometry x="0.3355" relative="1" as="geometry">
+            <mxPoint y="11" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-17" value="采样频率选择" style="swimlane;whiteSpace=wrap;html=1;labelBackgroundColor=none;rounded=1;fillColor=#FAE5C7;strokeColor=#0F8B8D;fontColor=#143642;" vertex="1" parent="1">
+          <mxGeometry x="500" y="-1255" width="210" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-18" value="&lt;div align=&quot;left&quot;&gt;Entry: t0.bco=1024&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; t0.pco=65535&lt;br&gt;&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;Do:&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &lt;br&gt;&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;Exit:&amp;nbsp; t0.bco=17663&lt;br&gt;&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; t0.pco=0&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;labelBackgroundColor=none;rounded=1;fontColor=#143642;" vertex="1" parent="A3RINRjMxJ3us1nBMxTI-17">
+          <mxGeometry x="10" y="17" width="130" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-19" value="&lt;font style=&quot;font-size: 48px;&quot;&gt;设置子系统状态机&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;rounded=1;labelBackgroundColor=none;fontColor=#143642;" vertex="1" parent="1">
+          <mxGeometry x="370" y="-1550" width="410" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-20" value="" style="ellipse;html=1;shape=endState;labelBackgroundColor=none;fillColor=#FAE5C7;strokeColor=#0F8B8D;fontColor=#143642;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="-1155" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-29" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;labelBackgroundColor=none;strokeColor=#A8201A;fontColor=default;" edge="1" parent="1" source="A3RINRjMxJ3us1nBMxTI-25" target="A3RINRjMxJ3us1nBMxTI-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-55" value="【旋钮反转】" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#143642;rounded=1;" vertex="1" connectable="0" parent="A3RINRjMxJ3us1nBMxTI-29">
+          <mxGeometry x="0.2727" y="-2" relative="1" as="geometry">
+            <mxPoint x="10" y="-8" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-45" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=none;strokeColor=#A8201A;fontColor=default;" edge="1" parent="1" source="A3RINRjMxJ3us1nBMxTI-25" target="A3RINRjMxJ3us1nBMxTI-35">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-59" value="【旋钮按键按下】" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#143642;rounded=1;" vertex="1" connectable="0" parent="A3RINRjMxJ3us1nBMxTI-45">
+          <mxGeometry x="0.3212" y="-2" relative="1" as="geometry">
+            <mxPoint y="11" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-47" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=none;strokeColor=#A8201A;fontColor=default;" edge="1" parent="1" source="A3RINRjMxJ3us1nBMxTI-25" target="A3RINRjMxJ3us1nBMxTI-7">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="873" y="-1105" />
+              <mxPoint x="328" y="-1105" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-50" value="【旋钮正转】" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#143642;rounded=1;" vertex="1" connectable="0" parent="A3RINRjMxJ3us1nBMxTI-47">
+          <mxGeometry x="0.1395" relative="1" as="geometry">
+            <mxPoint x="30" y="-7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-25" value="窗函数选择" style="swimlane;whiteSpace=wrap;html=1;labelBackgroundColor=none;rounded=1;fillColor=#FAE5C7;strokeColor=#0F8B8D;fontColor=#143642;" vertex="1" parent="1">
+          <mxGeometry x="820" y="-1255" width="210" height="106" as="geometry" />
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-26" value="&lt;div align=&quot;left&quot;&gt;Entry: t2.bco=1024&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; t2.pco=65535&lt;br&gt;&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;Do:&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &lt;br&gt;&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;Exit:&amp;nbsp; t2.bco=17663&lt;br&gt;&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; t2.pco=0&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;labelBackgroundColor=none;rounded=1;fontColor=#143642;" vertex="1" parent="A3RINRjMxJ3us1nBMxTI-25">
+          <mxGeometry x="10" y="16" width="130" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-44" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=none;strokeColor=#A8201A;fontColor=default;" edge="1" parent="1" source="A3RINRjMxJ3us1nBMxTI-33" target="A3RINRjMxJ3us1nBMxTI-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-58" value="【旋钮按键按下】" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#143642;rounded=1;" vertex="1" connectable="0" parent="A3RINRjMxJ3us1nBMxTI-44">
+          <mxGeometry x="-0.2327" y="-1" relative="1" as="geometry">
+            <mxPoint y="8" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-33" value="采样频率设置" style="swimlane;whiteSpace=wrap;html=1;labelBackgroundColor=none;rounded=1;fillColor=#FAE5C7;strokeColor=#0F8B8D;fontColor=#143642;" vertex="1" parent="1">
+          <mxGeometry x="500" y="-1425" width="210" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-34" value="&lt;div align=&quot;left&quot;&gt;Entry: n0.bco=1024&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; n0.pco=65535&lt;br&gt;&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;Do:&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &lt;br&gt;&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;Exit:&amp;nbsp;&amp;nbsp; n0.bco=65535&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; n0.pco=0&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;labelBackgroundColor=none;rounded=1;fontColor=#143642;" vertex="1" parent="A3RINRjMxJ3us1nBMxTI-33">
+          <mxGeometry x="10" y="17" width="130" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-46" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=none;strokeColor=#A8201A;fontColor=default;" edge="1" parent="1" source="A3RINRjMxJ3us1nBMxTI-35" target="A3RINRjMxJ3us1nBMxTI-25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-60" value="【旋钮按键按下】" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#143642;rounded=1;" vertex="1" connectable="0" parent="A3RINRjMxJ3us1nBMxTI-46">
+          <mxGeometry x="-0.203" y="-1" relative="1" as="geometry">
+            <mxPoint y="8" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-35" value="&lt;div&gt;窗函数设置&lt;/div&gt;" style="swimlane;whiteSpace=wrap;html=1;labelBackgroundColor=none;rounded=1;fillColor=#FAE5C7;strokeColor=#0F8B8D;fontColor=#143642;" vertex="1" parent="1">
+          <mxGeometry x="820" y="-1425" width="210" height="107" as="geometry" />
+        </mxCell>
+        <mxCell id="A3RINRjMxJ3us1nBMxTI-36" value="&lt;div align=&quot;left&quot;&gt;Entry: t4.bco=1024&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; t4.pco=65535&lt;br&gt;&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;Do:&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &lt;br&gt;&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;Exit:&amp;nbsp;&amp;nbsp; t4.bco=65535&lt;/div&gt;&lt;div align=&quot;left&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; t4.pco=0&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;labelBackgroundColor=none;rounded=1;fontColor=#143642;" vertex="1" parent="A3RINRjMxJ3us1nBMxTI-35">
+          <mxGeometry x="10" y="17" width="130" height="90" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

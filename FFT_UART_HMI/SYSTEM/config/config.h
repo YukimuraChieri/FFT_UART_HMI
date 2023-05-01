@@ -1,7 +1,7 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-// 系统配置头文件
+// 频谱仪系统配置头文件
 
 #define	NPT  256							/* 采样点数 */
 #define PI2 6.28318530717959
@@ -17,7 +17,7 @@
 #define MAX_SAM_FREQ 80000.0
 
 // 曲线图高度
-#define SCOPE_HIGH	180
+#define SCOPE_HIGH	190
 // 曲线图宽度
 #define SCOPE_WIDTH	256
 
