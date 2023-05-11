@@ -1,4 +1,5 @@
 #include "usart.h"
+#include "delay.h"
 
 uint8_t tx_buff[UART1_TX_BUFF_SIZE] = {0};	// 串口发送缓冲
 uint8_t rx_buff[UART1_RX_BUFF_SIZE] = {0};	// 串口接收缓冲
@@ -48,9 +49,15 @@ void UART1_Init(uint32_t pclk2, uint32_t bound)
 // 串口发送数据，使用DMA1通道4
 void UART1_TX_Bytes(const uint8_t* data, uint16_t len)
 {	
+	uint8_t timeout_cnt = 0;		// 超时计数
 	if (len < UART1_TX_BUFF_SIZE)
 	{
-		while(0 != DMA_TX_FLAG);				// 等待上个数据传输完成
+		// 等待上个数据传输完成，时间小于50ms
+		while((0 != DMA_TX_FLAG) && (timeout_cnt < 50))
+		{
+			delay_ms(1);
+			timeout_cnt++;
+		}
 		DMA1_Channel4->CCR &= ~(1<<0);	// 关闭DMA1通道4
 		memcpy(tx_buff, data, len);		// 拷贝传输数据到发送缓冲
 		DMA1_Channel4->CNDTR = len;		// 定义DMA的传输量

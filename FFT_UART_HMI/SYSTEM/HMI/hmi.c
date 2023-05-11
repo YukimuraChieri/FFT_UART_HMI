@@ -41,6 +41,9 @@ static uint8_t err;
 static int16_t enc_dalta = 0;
 //static uint8_t x_zoom = 1;			// x轴缩放
 static uint8_t y_zoom = 1;			// y轴缩放
+static uint8_t running_flag = 1;	// 系统运行状态：1运行，0暂停
+static uint8_t timeout_cnt = 0;		// 超时计数
+static uint8_t com_error = 0;			// 串口屏通信故障状态
 
 // HMI系统状态机
 void HMI_StateMachine(void)
@@ -114,7 +117,10 @@ void HMI_StateMachine(void)
 		case HMI_Spectrum: {	// 频谱仪界面
 			if (KEY_Action_Down == (uint32_t)OSMboxPend(msg_key_enc, 1, &err))	// 编码器按键按下动作
 			{
-				sub_fft.exit_signal = 1;		// 发送频谱仪子系统中止信号
+				if(0 == com_error)						// 串口通信无故障才可中止
+				{
+					sub_fft.exit_signal = 1;		// 发送频谱仪子系统中止信号
+				}
 			}
 			else if (SUB_FFT_Exit == sub_fft.state)	// 子系统退出
 			{
@@ -175,11 +181,12 @@ void SUB_FFT_StateMachine(SUB_FFT_Object_T* sub)
 			{
 				if (0 == memcmp(rx_data, "\xFE\xFF\xFF\xFF", 4))	// 是否为透传就绪
 				{
+					com_error = 0;			// 串口屏通信正常
 					sub->state = SUB_FFT_SendData;	// 切换到发送数据状态
+					timeout_cnt = 0;		// 复位超时计数
 					if (0 != sub->cursor_update)	//填充游标数组
 					{
 						sub->cursor_update = 0;
-						
 						memset(send_data, 0x00, sizeof(send_data));
 						send_data[2*npt_pos] = SCOPE_HIGH;
 					}
@@ -225,6 +232,15 @@ void SUB_FFT_StateMachine(SUB_FFT_Object_T* sub)
 					UART1_TX_Bytes(send_data, NPT);
 				}
 			}
+			else if(timeout_cnt > 50)		// 大于50ms
+			{
+				com_error = 1;				// 串口屏通信故障
+				sub->state = SUB_FFT_Default;	// 等待超时，返回默认状态
+				memset(send_data, 0x00, sizeof(send_data));
+				UART1_TX_Bytes(send_data, NPT);
+				DMA1_CH1_Start(NPT);	// 启动DMA1 CH1
+			}
+			timeout_cnt++;		// 超时计数+1
 		} break;
 		
 		case SUB_FFT_SendData: {	// 透传数据发送状态
@@ -232,10 +248,21 @@ void SUB_FFT_StateMachine(SUB_FFT_Object_T* sub)
 			{
 				if (0 == memcmp(rx_data, "\xFD\xFF\xFF\xFF", 4))	// 是否为透传完成
 				{
+					com_error = 0;			// 串口屏通信正常
 					sub->state = SUB_FFT_Default;	// 切换到初始状态
 					DMA1_CH1_Start(NPT);	// 启动DMA1 CH1
+					timeout_cnt = 0;		// 复位超时计数
 				}
 			}
+			else if(timeout_cnt > 50)		// 大于50ms
+			{
+				com_error = 1;				// 串口屏通信故障
+				sub->state = SUB_FFT_Default;	// 等待超时，返回默认状态
+				memset(send_data, 0x00, sizeof(send_data));
+				UART1_TX_Bytes(send_data, NPT);
+				DMA1_CH1_Start(NPT);	// 启动DMA1 CH1
+			}
+			timeout_cnt++;		// 超时计数+1
 		} break;
 		
 		case SUB_FFT_Default: {		// 初始状态
@@ -243,8 +270,9 @@ void SUB_FFT_StateMachine(SUB_FFT_Object_T* sub)
 			{
 				sub->state = SUB_FFT_Exit;			// 子系统退出
 				sub->exit_signal = 0;				// 退出完成，中止信号置0
+				running_flag = 1;						// 使能运行
 			}
-			else if (0 != adc_dma_flag)
+			else if ( (0 != adc_dma_flag) && (0 != running_flag) )
 			{
 				sub->state = SUB_FFT_SendCMD;		// 切换到发送命令状态
 				adc_dma_flag = 0;						// 传输完成标志置0
@@ -252,6 +280,11 @@ void SUB_FFT_StateMachine(SUB_FFT_Object_T* sub)
 				// 发送数据透传命令
 				sprintf(hmi_cmd, "addt s0.id,0,%d\xFF\xFF\xFF", NPT);
 				UART1_TX_Bytes((uint8_t*)hmi_cmd, strlen(hmi_cmd));
+				timeout_cnt = 0;		// 复位超时计数
+			}
+			else if (KEY_Action_Down == (uint32_t)OSMboxPend(msg_key1, 1, &err))	// 按键1按下动作
+			{
+				running_flag = !running_flag;		// 运行状态反转
 			}
 			else
 			{
